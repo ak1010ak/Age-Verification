@@ -1,6 +1,8 @@
 \documentclass[11pt]{article}
 \usepackage{amsmath, amssymb, amsthm, geometry, graphicx, hyperref}
 \usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
 \geometry{margin=1in}
 \title{Zero-Knowledge Age Verification Protocol Using Pedersen Commitments}
 \author{---}
@@ -289,7 +291,7 @@ Beyond the foundational protocol and basic security recommendations, several ref
 \subsection{Integration and Security Verification}
 
 \begin{itemize}
-    \item \textbf{Formal Verification:} Model the full protocol in \texttt{ProVerif}, \texttt{Tamarin}, or \texttt{F\textsuperscript{⋆}} to analyze confidentiality, soundness, and unlinkability.
+    \item \textbf{Formal Verification:} Model the full protocol in \texttt{ProVerif}, \texttt{Tamarin}, or \texttt{F\textsuperscript{\⋆}} to analyze confidentiality, soundness, and unlinkability.
     \item \textbf{Implementation Review:} Conduct independent audits focusing on randomness generation, nonce uniqueness, and memory safety in proof libraries.
     \item \textbf{Interoperability:} Use standardized serialization formats (CBOR, JSON-LD, or DID-compatible structures) to integrate with digital identity frameworks such as W3C Verifiable Credentials.
 \end{itemize}
@@ -303,6 +305,100 @@ Incorporating these enhancements yields a protocol that is:
     \item Compatible with revocation, policy, and interoperability layers.
     \item Securely bound to its application context and resistant to replay or linkage attacks.
 \end{itemize}
+
+\section{Diagram}
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[
+  node distance=1.7cm,
+  box/.style={
+    rectangle,
+    draw,
+    rounded corners,
+    align=center,
+    minimum width=5.5cm,
+    minimum height=1.2cm,
+    fill=gray!10
+  },
+  arrow/.style={-Latex, thick},
+  every node/.append style={font=\small}
+]
+
+% Nodes (stacked top-down)
+\node[box, fill=gray!10] (user) {\textbf{User} \\ Requests credential from issuer};
+\node[box, fill=gray!20, below=of user] (issuer) {\textbf{Issuer} \\ Verifies government ID and eligibility};
+\node[box, fill=gray!10, below=of issuer] (keygen) {\textbf{Issuer Key Generation} \\ Generates key pair $(sk_I, pk_I)$};
+\node[box, fill=gray!20, below=of keygen] (cred) {\textbf{Credential Creation} \\ Creates a commitment $C = \text{Com}(b, r)$ for user's age $b$};
+\node[box, fill=gray!10, below=of cred] (sign) {\textbf{Issuance Signature} \\ Signs commitment using issuer’s private key: $\sigma = \text{Sign}_{sk_I}(C)$};
+\node[box, fill=gray!20, below=of sign] (store) {\textbf{User Storage} \\ User receives $(C, \sigma)$ and stores securely};
+
+% Arrows
+\draw[arrow] (user) -- (issuer);
+\draw[arrow] (issuer) -- (keygen);
+\draw[arrow] (keygen) -- (cred);
+\draw[arrow] (cred) -- (sign);
+\draw[arrow] (sign) -- (store);
+
+% Optional labels for flow
+\node[right=0.3cm of user.east, align=left] {Step 1: Request};
+\node[right=0.3cm of issuer.east, align=left] {Step 2: Verify identity};
+\node[right=0.3cm of keygen.east, align=left] {Step 3: Generate keys};
+\node[right=0.3cm of cred.east, align=left] {Step 4: Commit to data};
+\node[right=0.3cm of sign.east, align=left] {Step 5: Sign credential};
+\node[right=0.3cm of store.east, align=left] {Step 6: Store output};
+
+\end{tikzpicture}
+\caption{Step 2 – Getting Digital ID using Pedersen Commitments}
+\label{fig:age-verification}
+\end{figure}
+
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[
+  node distance=1.7cm,
+  box/.style={
+    rectangle,
+    draw,
+    rounded corners,
+    align=center,
+    minimum width=6.5cm,
+    minimum height=1.2cm,
+    fill=gray!10
+  },
+  arrow/.style={-Latex, thick},
+  every node/.append style={font=\small}
+]
+
+% Nodes (stacked top-down)
+\node[box, fill=gray!10] (user) {\textbf{User (Prover)} \\ Holds $(C, \sigma)$ and wants to prove $b > 18$};
+\node[box, fill=gray!20, below=of user] (verifySig) {\textbf{Verifier (Service)} \\ Checks issuer’s public key $pk_I$ and signature $\sigma$ validity};
+\node[box, fill=gray!10, below=of verifySig] (commit) {\textbf{Prover Commitment} \\ Computes $C = g^b h^r$ and generates ZK proof of $b > 18$};
+\node[box, fill=gray!20, below=of commit] (proofSend) {\textbf{Send Proof} \\ Sends $(C, \pi)$ where $\pi$ is zero-knowledge proof of age threshold};
+\node[box, fill=gray!10, below=of proofSend] (verifyProof) {\textbf{Verifier Validation} \\ Verifies proof $\pi$ without learning $b$};
+\node[box, fill=gray!20, below=of verifyProof] (result) {\textbf{Access Decision} \\ If $\pi$ valid $\Rightarrow$ access granted, else denied};
+
+% Arrows
+\draw[arrow] (user) -- (verifySig);
+\draw[arrow] (verifySig) -- (commit);
+\draw[arrow] (commit) -- (proofSend);
+\draw[arrow] (proofSend) -- (verifyProof);
+\draw[arrow] (verifyProof) -- (result);
+
+% Optional right-hand labels
+\node[right=0.3cm of user.east, align=left] {Step 1: User prepares proof};
+\node[right=0.3cm of verifySig.east, align=left] {Step 2: Verify issuer credentials};
+\node[right=0.3cm of commit.east, align=left] {Step 3: Build Pedersen commitment};
+\node[right=0.3cm of proofSend.east, align=left] {Step 4: Send commitment and ZK proof};
+\node[right=0.3cm of verifyProof.east, align=left] {Step 5: Verify proof validity};
+\node[right=0.3cm of result.east, align=left] {Step 6: Grant or deny access};
+
+\end{tikzpicture}
+\caption{Step 2 – Zero-Knowledge Age Verification Protocol using Pedersen Commitments}
+\label{fig:age-verification}
+\end{figure}
+
 
 
 
