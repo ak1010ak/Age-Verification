@@ -71,6 +71,31 @@
 
 \end{frame}
 
+\begin{frame}{Bulletproofs (Range Proofs)}
+
+\begin{align*}
+  &\text{Prove } 0 \le v < 2^{n} \text{ without revealing } v.\\[3pt]
+  &\text{Compact (log-size) proof, no trusted setup.}
+\end{align*}
+
+\medskip
+\textbf{Overview}
+\begin{itemize}
+  \item \textbf{Bulletproofs} are short, non-interactive \textbf{range proofs}.
+  \item Based on \textbf{inner product arguments} for efficiency.
+  \item No trusted setup, fully transparent.
+\end{itemize}
+
+\medskip
+\textbf{Uses}
+\begin{itemize}
+  \item Confidential transactions (e.g., Monero, Bitcoin).
+  \item Showing age or value in a valid range.
+  \item Proving credentials (e.g., not expired).
+\end{itemize}
+
+\end{frame}
+
 \begin{frame}{BBS+ Signatures (BLS12-381)}
 
 \begin{columns}[T,onlytextwidth]
@@ -97,31 +122,38 @@
 \end{columns}
 \end{frame}
 
+\begin{frame}{RSA Accumulator (Basic Idea)}
 
-\begin{frame}{Bulletproofs (Range Proofs)}
-
-\begin{align*}
-  &\text{Prove } 0 \le v < 2^{n} \text{ without revealing } v.\\[3pt]
-  &\text{Compact (log-size) proof, no trusted setup.}
-\end{align*}
-
-\medskip
+\begin{columns}[T,onlytextwidth]
+\column{0.5\textwidth}
 \textbf{Overview}
 \begin{itemize}
-  \item \textbf{Bulletproofs} are short, non-interactive \textbf{range proofs}.
-  \item Based on \textbf{inner product arguments} for efficiency.
-  \item No trusted setup, fully transparent.
+  \item An \textbf{RSA accumulator} is a compact way to represent a set of values using one number.  
+  \item Built on the \textbf{RSA assumption} — hard to factor large numbers.  
+  \item Used to prove that an item \textbf{is or is not} part of a set without revealing the whole set.  
+  \item Commonly used for \textbf{revocation lists} in anonymous credential systems.
 \end{itemize}
+
+\column{0.5\textwidth}
+\textbf{How It Works}
+\begin{itemize}
+  \item The issuer combines all elements into one value called the \textbf{accumulator}.  
+  \item Each user gets a small \textbf{witness} proving their element is included.  
+  \item Verification uses simple modular arithmetic and stays \textbf{constant-size}, no matter how large the set is.
+\end{itemize}
+
+\end{columns}
 
 \medskip
-\textbf{Uses}
-\begin{itemize}
-  \item Confidential transactions (e.g., Monero, Bitcoin).
-  \item Showing age or value in a valid range.
-  \item Proving credentials (e.g., not expired).
-\end{itemize}
+\textbf{Security Properties:}  
+Unforgeable • Compact • Efficient • Privacy-friendly
 
 \end{frame}
+
+
+
+
+
 
 
 % 3. Protocol Overview
