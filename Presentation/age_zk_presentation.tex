@@ -42,10 +42,10 @@
 \begin{frame}{Schnorr Profs of Knowledge}
 
 \begin{align*}
-  \text{Goal: Prove knowledge of } x \text{ such that } X = g^x \text{ (mod } p) \text{ without revealing } x.
+  \text{Goal: Prove knowledge of } x \text{ such that } X = g^x \text{ (mod } q) \text{ without revealing } x.
 \end{align*}
 \begin{itemize}
-  \item \textbf{Setup:} Public parameters $(g, p, q)$ where $g$ generates a group of prime order $q$.
+  \item \textbf{Setup:} Public parameters $(g, q)$ where $g$ generates a group of prime order $q$.
   \item \textbf{Prover:} Chooses random $y \in \mathbb{Z}_q$, sends $Y = g^y$.
   \item \textbf{Verifier:} Sends random challenge $c \in \mathbb{Z}_q$.
   \item \textbf{Prover:} Responds with $r = y + cx \pmod{q}$.
